@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caelaficha - Materialización de Ideas</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6a4cff;
+      --secondary: #00e1ff;
+      --accent: #ff2a78;
+      --dark: #0a0c17;
+      --darker: #070812;
+      --light: #e0f7ff;
+      --text: #c7e5ff;
+      --card-bg: rgba(20,22,40,0.7);
+      /* Variables actualizadas para el botón Premium a púrpura/rosa */
+      --premium-button-light: #FF008C; /* Rosa vibrante/magenta claro */
+      --premium-button-dark: #A30057;  /* Púrpura oscuro/magenta oscuro */
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background: var(--darker); color: var(--text); font-family:'Exo 2',sans-serif; line-height: 1.7; overflow-x: hidden; }
+    
+    header { 
+        background: rgba(10, 12, 23, 0.85); /* Fondo semitransparente con blur */
+        position: sticky; 
+        top: 0; 
+        z-index: 100; 
+        padding: 25px 0; /* Padding ajustado para coincidir con la otra página */
+        border-bottom: 1px solid rgba(106,76,255,0.2); 
+        backdrop-filter: blur(10px); /* Efecto de blur */
+    }
+    .header-container { max-width:1200px; margin:0 auto; padding:0 20px; display:flex; align-items:center; justify-content:space-between; }
+    .logo { display:flex; align-items:center; text-decoration:none; gap: 12px; /* Añadido gap para espacio entre icono y texto */ }
+    .logo-icon { font-size:28px; color: var(--secondary); animation: pulse 3s infinite; }
+    .logo-text { font-family:'Orbitron',sans-serif; font-size:26px; font-weight:800; background: linear-gradient(90deg,var(--primary),var(--secondary)); -webkit-background-clip:text; background-clip: text; color:transparent; letter-spacing:1px; }
+    nav ul { display:flex; list-style:none; gap:35px; }
+    nav a { color: var(--light); text-decoration:none; font-weight:600; font-size:16px; position:relative; transition: all 0.3s; }
+    nav a::after { content:''; position:absolute; bottom:-5px; left:0; width:0; height:2px; background: var(--secondary); transition:width 0.3s; }
+    nav a:hover { color: var(--secondary); }
+    nav a:hover::after { width:100%; }
+
+    /* Estilos del botón CTA (Premium) actualizados a púrpura/rosa */
+    .cta-button { 
+        background: radial-gradient(circle at center, var(--premium-button-light) 0%, var(--premium-button-dark) 100%); 
+        color: white; 
+        border:none; 
+        padding:12px 30px; 
+        border-radius:30px; 
+        font-family:'Exo 2',sans-serif; 
+        font-weight:700; 
+        font-size:16px; 
+        cursor:pointer; 
+        text-transform:uppercase; 
+        letter-spacing:1px; 
+        box-shadow:0 0 20px rgba(255,0,140,0.4); /* Sombra púrpura/rosa */
+        position:relative; 
+        overflow:hidden; 
+        display:flex; 
+        align-items:center; 
+        gap:8px; 
+        transition: all 0.3s ease; /* Añadida transición para efectos hover */
+    }
+    .cta-button i { font-size:18px; }
+    .cta-button::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -60%;
+        width: 40px;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(25deg);
+        transition: all 0.4s;
+    }
+    .cta-button:hover::after {
+        left: 120%;
+    }
+    .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 30px rgba(255,0,140,0.7); /* Sombra hover más intensa */
+    }
+
+    @keyframes pulse { 0% { transform: scale(1); opacity:1; } 50% { transform: scale(1.1); opacity:0.8; } 100% { transform: scale(1); opacity:1; } }
+    
+    main { padding: 40px 20px; max-width:1200px; margin:0 auto; }
+    h1 { font-family:'Orbitron',sans-serif; font-size:2.8rem; text-align:center; margin-bottom:20px; }
+    p.description { text-align:center; max-width:800px; margin:0 auto 40px; color: var(--light); }
+    
+    /* Modificación para el grid de 2 columnas */
+    .form-grid { 
+        display:grid; 
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas de igual ancho */
+        gap:20px; 
+    }
+
+    /* Ajuste para pantallas más pequeñas para que las tarjetas se apilen */
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr; /* Una columna en pantallas pequeñas */
+        }
+        .header-container {
+            flex-direction: column;
+            gap: 20px;
+        }
+        nav ul {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+    }
+
+    .form-card { 
+        background: var(--card-bg); 
+        padding:20px; 
+        border-radius:8px; 
+        border: 1px solid rgba(106, 76, 255, 0.2); /* Borde similar a las otras tarjetas */ 
+        display: flex; /* Para mejor alineación del label y el input/textarea */
+        flex-direction: column; /* Apila el label y el input/textarea */
+    }
+    .form-card label { display:block; margin-bottom:8px; font-weight:600; color: var(--secondary); /* Color de etiquetas consistente */ }
+    .form-card input, .form-card textarea, .form-card select { /* Añadido select aquí */
+        flex-grow: 1; /* Permite que el input/textarea ocupe el espacio restante */
+        width:100%; 
+        padding:10px; 
+        border:1px solid rgba(106,76,255,0.4); 
+        border-radius:6px; 
+        background: rgba(15,18,45,0.6); 
+        color: var(--text); 
+        font-family:'Exo 2',sans-serif; /* Consistencia en la fuente */
+        transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transiciones para el foco */
+    }
+    .form-card input:focus, .form-card textarea:focus, .form-card select:focus { /* Añadido select aquí */
+        outline: none;
+        border-color: var(--secondary);
+        box-shadow: 0 0 0 3px rgba(0, 225, 255, 0.2);
+    }
+    .form-card textarea { resize:vertical; min-height:80px; }
+    .actions { text-align:center; margin-top:30px; }
+
+    /* Estilos para la sección de respuestas de la IA */
+    .ai-response-container {
+        background: var(--card-bg);
+        border: 1px solid rgba(0, 225, 255, 0.2);
+        border-radius: 15px;
+        padding: 25px 30px;
+        margin-top: 40px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .ai-response-container h2 {
+        font-family: 'Orbitron', sans-serif;
+        color: var(--secondary);
+        margin-bottom: 20px;
+        text-align: center;
+        font-size: 1.8rem;
+    }
+
+    .ai-response-content {
+        padding: 10px 15px;
+        color: var(--light);
+        font-size: 0.95em;
+        text-align: left; /* Alineación del texto de la respuesta */
+        min-height: 100px; /* Altura mínima para la respuesta */
+    }
+
+    .ai-response-content strong {
+        color: var(--primary);
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid var(--secondary);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <a href="caelaficha-investigacion.html" class="logo"> <!-- Enlace cambiado a investigacion.html -->
+        <i class="fas fa-cog logo-icon"></i> <!-- Icono de engranaje -->
+        <span class="logo-text">CAELAFICHA</span>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="caelaficha-investigacion.html">Investigación Profunda</a></li>
+          <li><a href="caelaficha-materialize-ideas.html">Materialización de Ideas</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="imagenes.html">Imágenes</a></li>
+        </ul>
+      </nav>
+      <button class="cta-button" id="premium-access"><i class="fas fa-crown"></i> PREMIUM</button>
+    </div>
+  </header>
+  <main>
+    <h1>Materializa tu Idea: 12 Preguntas Clave</h1>
+    <p class="description">Responde estas 12 preguntas para que Caelaficha pueda organizar y estructurar tu visión, y así, generar una investigación profunda o un plan de acción para tu idea.</p>
+    <form class="form-grid" id="planForm">
+      <div class="form-card"><label for="q0">1. Idea principal: Describe brevemente tu idea de producto o servicio.</label><textarea id="q0"></textarea></div>
+      <div class="form-card"><label for="q1">2. Beneficio clave: ¿Qué valor único aportará tu idea a los usuarios o clientes?</label><textarea id="q1"></textarea></div>
+      <div class="form-card"><label for="q2">3. Funciones esenciales (MVP): ¿Cuáles son las 3-5 características *mínimas* para lanzar y probar tu idea?</label><textarea id="q2"></textarea></div>
+      <div class="form-card"><label for="q3">4. Modelo de negocio: ¿Cómo planeas generar ingresos con esta idea?</label><input id="q3"></div>
+      <div class="form-card"><label for="q4">5. Diferenciador: ¿Qué hará que tu idea destaque de lo que ya existe?</label><textarea id="q4"></textarea></div>
+      <div class="form-card"><label for="q5">6. Equipo inicial: ¿Qué roles esenciales necesitas para empezar a construir tu idea?</label><input id="q5"></div>
+      <div class="form-card"><label for="q6">7. Herramientas y plataformas: ¿Qué software, hardware o plataformas planeas usar para desarrollarla?</label><input id="q6"></div>
+      <div class="form-card"><label for="q7">8. Inversión inicial: ¿Cuánto dinero estimas que necesitarás para la fase inicial?</label><input id="q7"></div>
+      <div class="form-card"><label for="q8">9. Desafíos iniciales: ¿Cuáles son los mayores obstáculos que prevés al iniciar y cómo los afrontarás?</label><textarea id="q8"></textarea></div>
+      <div class="form-card"><label for="q9">10. Primeros pasos y plazos: ¿Cuáles son los 3 primeros hitos que quieres alcanzar y en qué tiempo?</label><input id="q9"></div>
+      <div class="form-card"><label for="q10">11. Medir el éxito: ¿Cómo sabrás si tu idea está funcionando bien al principio?</label><input id="q10"></div>
+      <div class="form-card"><label for="q11">12. Pruebas con usuarios: ¿Cómo harás que los primeros usuarios prueben tu idea y te den feedback?</label><textarea id="q11"></textarea></div>
+      
+      <!-- Nuevo campo para el nivel de detalle de la respuesta de la IA -->
+      <div class="form-card">
+        <label for="ai-response-detail">13. Nivel de detalle de la respuesta de la IA:</label>
+        <select id="ai-response-detail">
+          <option value="plan_accion">Plan de Acción (Pasos a seguir)</option>
+          <option value="investigacion_profunda">Investigación Profunda (Análisis completo)</option>
+          <option value="resumen_ejecutivo">Resumen Ejecutivo (Puntos clave)</option>
+        </select>
+      </div>
+
+    </form>
+    <div class="actions">
+      <button id="generatePlanBtn" class="cta-button"><i class="fas fa-magic"></i>Generar Plan con IA</button>
+    </div>
+
+    <div class="ai-response-container">
+      <h2>Respuesta de la IA</h2>
+      <div id="ai-response-content" class="ai-response-content">
+        <p>Tu investigación o plan generado por la IA aparecerá aquí después de enviar el formulario.</p>
+      </div>
+    </div>
+  </main>
+  <script type="module">
+    // Preguntas para un fácil acceso por ID
+    const questions = [
+      "1. Idea principal", "2. Beneficio clave", "3. Funciones esenciales (MVP)",
+      "4. Modelo de negocio", "5. Diferenciador", "6. Equipo inicial",
+      "7. Herramientas y plataformas", "8. Inversión inicial", "9. Desafíos iniciales",
+      "10. Primeros pasos y plazos", "11. Medir el éxito", "12. Pruebas con usuarios"
+    ];
+
+    // Función para mostrar el spinner de carga
+    const showLoadingSpinner = () => {
+        const aiResponseContent = document.getElementById('ai-response-content');
+        aiResponseContent.innerHTML = '<div class="loading-spinner"></div><p style="text-align: center;">Generando investigación profunda...</p>';
+    };
+
+    // Función para mostrar la respuesta de la IA
+    const displayAIResponse = (content) => {
+        const aiResponseContent = document.getElementById('ai-response-content');
+        // Simple sanitización y formato para mostrar markdown básico como negritas
+        aiResponseContent.innerHTML = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+    };
+
+    // Función para manejar el clic del botón "Generar Plan con IA"
+    document.getElementById('generatePlanBtn').onclick = async () => {
+        showLoadingSpinner(); // Mostrar spinner al iniciar la generación
+
+        const responseDetail = document.getElementById('ai-response-detail').value;
+        let promptModifier = "";
+
+        switch (responseDetail) {
+            case "plan_accion":
+                promptModifier = "Genera un plan de acción conciso y con pasos claros para materializar la idea. Incluye secciones como: Resumen del Plan, Pasos Clave (con plazos sugeridos), Recursos Necesarios, Riesgos Potenciales y Medición de Éxito.";
+                break;
+            case "investigacion_profunda":
+                promptModifier = "Realiza una investigación profunda y un análisis detallado de la idea, incluyendo un análisis de mercado, competencia, viabilidad técnica, riesgos y oportunidades. Estructura la respuesta con secciones claras como: Resumen Ejecutivo, Análisis de Mercado, Análisis de la Competencia, Viabilidad, Análisis DAFO (SWOT), y Recomendaciones.";
+                break;
+            case "resumen_ejecutivo":
+                promptModifier = "Genera un resumen ejecutivo de la idea, destacando los puntos más importantes para su materialización. Incluye: La Idea Central, Beneficio Principal, Pasos Sugeridos, y Conclusión.";
+                break;
+        }
+
+        let prompt = `${promptModifier}\n\nBasado en las siguientes respuestas a preguntas clave:\n\n`;
+        let allFieldsEmpty = true;
+
+        for(let i = 0; i < questions.length; i++) {
+            const el = document.getElementById('q' + i);
+            const value = el.value.trim();
+            prompt += `${questions[i]}: ${value || 'No especificado'}\n`;
+            if (value !== '') {
+                allFieldsEmpty = false;
+            }
+        }
+
+        if (allFieldsEmpty) {
+            displayAIResponse('<p style="color: var(--accent); text-align: center;">Por favor, completa al menos algunas preguntas para que la IA pueda generar un plan.</p>');
+            return;
+        }
+
+        try {
+            // Llama a la API de Gemini para generar contenido
+            const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // Canvas proporcionará esta clave en tiempo de ejecución
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Error de la API: ${response.status} ${response.statusText} - ${errorData.error.message}`);
+            }
+
+            const result = await response.json();
+            
+            if (result.candidates && result.candidates.length > 0 &&
+                result.candidates[0].content && result.candidates[0].content.parts &&
+                result.candidates[0].content.parts.length > 0) {
+                const aiText = result.candidates[0].content.parts[0].text;
+                displayAIResponse(aiText);
+            } else {
+                displayAIResponse('<p style="color: var(--accent); text-align: center;">No se pudo generar la respuesta de la IA. La estructura de la respuesta no es la esperada.</p>');
+            }
+        } catch (error) {
+            console.error("Error al generar el plan con IA:", error);
+            displayAIResponse(`<p style="color: var(--accent); text-align: center;">Error al generar la respuesta: ${error.message}. Por favor, intenta de nuevo.</p>`);
+        }
+    };
+
+    // Inicializar el contenido de la respuesta de la IA al cargar la página
+    window.onload = () => {
+        displayAIResponse('<p style="text-align: center;">Tu investigación o plan generado por la IA aparecerá aquí después de enviar el formulario.</p>');
+    };
+  </script>
+</body>
+</html>

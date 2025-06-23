@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caelaficha - Acceso Premium</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.net.min.js"></script>
+  <style>
+    :root {
+      --primary: #6a4cff;
+      --secondary: #00e1ff;
+      --accent: #ff2a78;
+      --dark: #0a0c17;
+      --darker: #070812;
+      --text: #ffffff;
+      --card-bg: rgba(20, 22, 40, 0.85);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Exo 2', sans-serif; background: var(--darker); color: var(--text); }
+    #vanta-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+    .grid { background-image: linear-gradient(rgba(106,76,255,0.05) 1px, transparent 1px),
+                     linear-gradient(90deg, rgba(106,76,255,0.05) 1px, transparent 1px);
+              background-size: 40px 40px; z-index: -1; }
+    .glow { background: radial-gradient(circle at center, rgba(106,76,255,0.1) 0%, transparent 70%); z-index: -1; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    header { position: sticky; top: 0; backdrop-filter: blur(10px);
+             background: rgba(10,12,23,0.85); border-bottom: 1px solid rgba(106,76,255,0.2); z-index: 100; }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-icon { font-size: 28px; color: var(--secondary); animation: pulse 3s infinite; }
+    .logo-text { font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 800;
+                 background: linear-gradient(90deg, var(--primary), var(--secondary));
+                 -webkit-background-clip: text; color: transparent; }
+    nav ul { display: flex; gap: 30px; list-style: none; }
+    nav a { color: var(--text); text-decoration: none; font-weight: 600; position: relative; }
+    nav a::after { content: ''; position: absolute; bottom: -4px; left: 0;
+                    width: 0; height: 2px; background: var(--secondary);
+                    transition: width .3s; }
+    nav a:hover::after { width: 100%; }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+    .hero { padding: 100px 0; text-align: center; }
+    .hero h1 { font-family: 'Orbitron', sans-serif; font-size: 3rem; margin-bottom: 20px;
+                background: linear-gradient(90deg, var(--secondary), var(--accent));
+                -webkit-background-clip: text; color: transparent; }
+    .hero p { font-size: 1.2rem; max-width: 700px; margin: 0 auto 40px; }
+    .btn-group { display: flex; gap: 20px; justify-content: center; }
+    .btn-premium { background: linear-gradient(90deg, var(--primary), var(--accent));
+                    padding: 12px 24px; border: none; border-radius: 8px;
+                    color: #fff; text-transform: uppercase; cursor: pointer;
+                    transition: transform .2s; }
+    .btn-premium:hover { transform: scale(1.05); }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px,1fr)); gap: 30px; margin: 60px 0; }
+    .card { background: var(--card-bg); padding: 35px; border-radius: 15px;
+             transition: transform .3s, box-shadow .3s; }
+    .card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
+    .card h3 { font-family: 'Orbitron', sans-serif; color: var(--accent); margin-bottom: 15px; font-size: 1.4rem; }
+    .card ul { list-style: none; padding-left: 20px; margin-bottom: 15px; }
+    .card ul li { margin-bottom: 12px; position: relative; padding-left: 28px; }
+    .card ul li::before { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+                           position: absolute; left: 0; color: var(--secondary); }
+    .card .more-btn { background: none; border: 2px solid var(--secondary);
+                      color: var(--secondary); padding: 8px 16px; border-radius: 8px;
+                      cursor: pointer; transition: background .2s; }
+    .card .more-btn:hover { background: var(--secondary); color: #000; }
+    .card .details { display: none; font-size: .9rem; line-height: 1.5; margin-top: 15px; }
+    .cta { text-align: center; padding: 80px 0; }
+    .cta input { padding: 12px; width: 280px; border: 2px solid rgba(106,76,255,0.3);
+                 border-radius:50px; margin-right:10px; background: rgba(15,18,45,0.7);
+                 color: var(--text); }
+    .cta input:focus { outline: none; border-color: var(--secondary); }
+    footer { background: rgba(5,7,18,0.9); padding: 60px 0; }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 40px; }
+    .footer h3 { font-family: 'Orbitron', sans-serif; margin-bottom: 15px; }
+    .footer a { color: #fff; text-decoration: none; display: block; margin-bottom: 8px; }
+    .footer-contact p { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.5rem; }
+      .btn-group { flex-direction: column; }
+      .cta input { width: 100%; margin-bottom: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="vanta-bg"></div>
+  <div class="overlay grid"></div>
+  <div class="overlay glow"></div>
+
+  <header>
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <i class="fas fa-atom logo-icon"></i>
+        <span class="logo-text">CAELAFICHA</span>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="caelaficha-materialize-ideas.html">Materializar Ideas</a></li>
+          <li><a href="caelaficha-investigacion.html">Investigación Profunda</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="imagenes.html">Imágenes</a></li>
+          <li><a href="#contact">Contacto</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Funciones Premium Avanzadas</h1>
+      <p>Con filtros de preguntas inteligentes que guían tu investigación, memoria de contexto para continuidad, análisis profundo al instante y colaboración multiusuario.</p>
+      <div class="btn-group">
+        <button class="btn-premium" onclick="scrollToSection('plans')">Ver Planes</button>
+        <button class="btn-premium" onclick="scrollToSection('cta')">Contacto</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="plans" class="container cards">
+    <div class="card">
+      <h3>Básico</h3>
+      <ul>
+        <li>100 créditos IA mensuales</li>
+        <li>Filtros de preguntas inteligentes</li>
+        <li>Memoria de sesión (hasta 5 queries)</li>
+        <li>Generación automática de resúmenes</li>
+      </ul>
+      <button class="more-btn">Más detalles</button>
+      <div class="details">Opta por claridad y velocidad: tu asistente recuerda el hilo de tu investigación y genera reportes automáticos sin perder precisión.</div>
+    </div>
+    <div class="card">
+      <h3>Pro</h3>
+      <ul>
+        <li>500 créditos IA mensuales</li>
+        <li>Priorización de cómputo para respuestas rápidas</li>
+        <li>Historial y almacenamiento de proyectos persistente</li>
+        <li>Integración API y webhooks personalizados</li>
+      </ul>
+      <button class="more-btn">Más detalles</button>
+      <div class="details">Para profesionales y equipos: acelera tu flujo, colabora en tiempo real y conecta Caelaficha con tus sistemas existentes sin esfuerzos.</div>
+    </div>
+    <div class="card">
+      <h3>Empresarial</h3>
+      <ul>
+        <li>Créditos IA ilimitados</li>
+        <li>Soporte SLA 24/7 con respuesta inmediata</li>
+        <li>Onboarding y formación personalizada</li>
+        <li>Integraciones a medida y hosting privado</li>
+      </ul>
+      <button class="more-btn">Más detalles</button>
+      <div class="details">Solución corporativa completa: arquitectura privada, seguridad avanzada y un gestor dedicado para impulsar tu innovación.</div>
+    </div>
+  </section>
+
+  <section id="cta" class="cta container">
+    <input type="email" placeholder="Tu correo electrónico" />
+    <button class="btn-premium">Enviar Consulta</button>
+  </section>
+
+  <footer class="footer container" id="contact">
+    <div class="footer-grid">
+      <div>
+        <h3>Caelaficha</h3>
+        <p>Materializa tus ideas con IA de nivel experto.</p>
+        <div class="footer-contact">
+          <p><i class="fas fa-envelope"></i> itfrombit@gmail.com</p>
+          <p><i class="fas fa-phone"></i> +54 15 2765 2386</p>
+        </div>
+      </div>
+      <div>
+        <h3>Enlaces Rápidos</h3>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="imagenes.html">Imágenes</a>
+      </div>
+      <div>
+        <h3>Soporte</h3>
+        <a href="#">Ayuda</a>
+        <a href="#">Privacidad</a>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:40px;font-size:.9rem;">&copy; 2025 Caelaficha. Todos los derechos reservados.</div>
+  </footer>
+
+  <script>
+    function scrollToSection(id) {
+      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    }
+    document.querySelectorAll('.more-btn').forEach(btn =>
+      btn.addEventListener('click', () => {
+        const details = btn.nextElementSibling;
+        details.style.display = details.style.display === 'block' ? 'none' : 'block';
+      })
+    );
+    window.addEventListener('load', () => {
+      VANTA.NET({
+        el: '#vanta-bg',
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        color: 0x6a4cff,
+        backgroundColor: 0x070812,
+        points: 12.00,
+        maxDistance: 30.00,
+        spacing: 20.00
+      });
+    });
+  </script>
+</body>
+</html>

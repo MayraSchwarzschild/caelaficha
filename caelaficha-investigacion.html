@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caelaficha - Investigación Profunda con IA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.net.min.js"></script>
+    <style>
+        :root {
+            --primary: #6a4cff;
+            --secondary: #00e1ff;
+            --accent: #ff2a78;
+            --dark: #0a0c17;
+            --darker: #070812;
+            --light: #e0f7ff;
+            --text: #c7e5ff;
+            --grid-color: rgba(106, 76, 255, 0.05);
+            --card-bg: rgba(20, 22, 40, 0.7);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: var(--darker);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.7;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        #vanta-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+        
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .glow-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(106, 76, 255, 0.1) 0%, rgba(7, 8, 18, 0) 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            padding: 25px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            background: rgba(10, 12, 23, 0.85);
+            border-bottom: 1px solid rgba(106, 76, 255, 0.2);
+            animation: fadeIn 1s ease;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            font-size: 28px;
+            color: var(--secondary);
+            animation: pulse 3s infinite;
+        }
+        
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 35px;
+        }
+        
+        nav a {
+            color: var(--light); /* Cambiado a blanco (var(--light)) */
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary);
+            transition: width 0.3s ease;
+        }
+        
+        nav a:hover {
+            color: var(--secondary);
+        }
+        
+        nav a:hover::after {
+            width: 100%;
+        }
+        
+        .cta-button {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(106, 76, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 40px;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(25deg);
+            transition: all 0.4s;
+        }
+        
+        .cta-button:hover::after {
+            left: 120%;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(106, 76, 255, 0.7);
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 100px;
+            position: relative;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4.2rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            line-height: 1.1;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            color: var(--light);
+        }
+        
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .secondary-button {
+            background: transparent;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 16px;
+            box-shadow: 0 0 15px rgba(0, 225, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .secondary-button:hover {
+            background: rgba(0, 225, 255, 0.15);
+            box-shadow: 0 0 25px rgba(0, 225, 255, 0.4);
+        }
+        
+        /* Features Section */
+        .section-title {
+            text-align: center;
+            margin-bottom: 70px;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            display: inline-block;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+        
+        .section-title p {
+            max-width: 600px;
+            margin: 25px auto 0;
+            font-size: 1.1rem;
+            color: var(--light);
+        }
+        
+        .features {
+            padding: 100px 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 35px;
+        }
+        
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(106, 76, 255, 0.2);
+            border-radius: 15px;
+            padding: 40px 30px;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            cursor: pointer;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(106, 76, 255, 0.1), rgba(0, 225, 255, 0.05));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 40px rgba(106, 76, 255, 0.2);
+        }
+        
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+        
+        .feature-card p {
+            margin-bottom: 20px;
+            color: var(--light);
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .feature-list li::before {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+        }
+        
+        /* Interactive Demo */
+        .interactive-demo {
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        .demo-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .demo-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(106, 76, 255, 0.3);
+            border-radius: 15px;
+            padding: 40px;
+            margin-top: 40px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .demo-output {
+            min-height: 200px;
+            padding: 20px;
+            background: rgba(15, 18, 45, 0.5);
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--light);
+            font-size: 1.1em;
+            flex-direction: column;
+        }
+        
+        .demo-output::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg,
+                rgba(106, 76, 255, 0.1) 0%,
+                rgba(0, 225, 255, 0.05) 100%);
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .demo-output p, .demo-output img {
+            z-index: 1; /* Ensure content is above pseudo-element */
+        }
+
+        .demo-output img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        
+        .demo-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .demo-btn {
+            padding: 12px 20px;
+            background: rgba(106, 76, 255, 0.2);
+            color: var(--secondary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 600;
+        }
+        
+        .demo-btn:hover {
+            background: rgba(106, 76, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid var(--secondary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Storage Section */
+        .data-storage {
+            padding: 100px 0;
+        }
+
+        .storage-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(106, 76, 255, 0.3);
+            border-radius: 15px;
+            padding: 40px;
+            margin-top: 40px;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .storage-input, .storage-textarea, .storage-select {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            background: rgba(15, 18, 45, 0.7);
+            border: 1px solid rgba(106, 76, 255, 0.3);
+            border-radius: 8px;
+            color: var(--light);
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .storage-input:focus, .storage-textarea:focus, .storage-select:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(0, 225, 255, 0.2);
+        }
+
+        .storage-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .notes-list {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .data-item {
+            background: rgba(15, 18, 45, 0.5);
+            border: 1px solid rgba(0, 225, 255, 0.15);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .data-content {
+            flex-grow: 1;
+            color: var(--light);
+            font-size: 0.95em;
+        }
+
+        .delete-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #e6005c;
+        }
+
+        .user-id-display {
+            background: rgba(106, 76, 255, 0.1);
+            color: var(--secondary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: 1px solid rgba(106, 76, 255, 0.3);
+        }
+
+        /* Timeline Section */
+        .timeline {
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .timeline-container {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .timeline-line {
+            position: absolute;
+            width: 4px;
+            background-color: var(--primary);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            margin-bottom: 60px;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row;
+        }
+
+        .timeline-content {
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 225, 255, 0.2);
+            border-radius: 15px;
+            padding: 25px 30px;
+            width: calc(50% - 30px);
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-right: 30px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 30px;
+        }
+
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 15px 0 15px 15px;
+            border-color: transparent transparent transparent var(--card-bg);
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content::before {
+            left: 100%;
+            transform: translateX(-15px);
+            border-width: 15px 0 15px 15px;
+            border-color: transparent transparent transparent var(--card-bg);
+        }
+
+        .timeline-item:nth-child(even) .timeline-content::before {
+            right: 100%;
+            transform: translateX(15px);
+            border-width: 15px 15px 15px 0;
+            border-color: transparent var(--card-bg) transparent transparent;
+        }
+
+        .timeline-content::after {
+            content: '';
+            position: absolute;
+            top: 30px;
+            width: 18px;
+            height: 18px;
+            background-color: var(--secondary);
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            z-index: 1;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content::after {
+            left: calc(100% + 20px);
+        }
+
+        .timeline-item:nth-child(even) .timeline-content::after {
+            right: calc(100% + 20px);
+        }
+        
+        .timeline-phase {
+            font-size: 0.9em;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .timeline-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5em;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .timeline-details ul {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 10px;
+        }
+
+        .timeline-details ul li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 5px;
+            color: var(--light);
+        }
+
+        .timeline-details ul li::before {
+            content: '\2022'; /* Bullet point */
+            color: var(--primary);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        /* Metrics Section */
+        .metrics {
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 225, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 225, 255, 0.3);
+        }
+
+        .metric-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3em;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            font-size: 1.2em;
+            color: var(--light);
+            font-weight: 600;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+            
+            .timeline-line {
+                left: 40px;
+            }
+            
+            .timeline-item {
+                flex-direction: row;
+                margin-left: 60px;
+            }
+            
+            .timeline-item:nth-child(even) {
+                flex-direction: row;
+            }
+            
+            .timeline-content {
+                width: 100%;
+            }
+            
+            .timeline-item:nth-child(odd) .timeline-content::before,
+            .timeline-item:nth-child(even) .timeline-content::before {
+                left: -57px;
+            }
+
+            .timeline-item:nth-child(odd) .timeline-content {
+                margin-right: 0;
+            }
+
+            .timeline-item:nth-child(even) .timeline-content {
+                margin-left: 0;
+            }
+
+            .timeline-item:nth-child(odd) .timeline-content::after {
+                left: -28px;
+            }
+
+            .timeline-item:nth-child(even) .timeline-content::after {
+                left: -28px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .cta-form {
+                flex-direction: column;
+            }
+            
+            nav ul {
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .data-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .delete-btn {
+                margin-left: 0;
+                width: 100%;
+            }
+            .author-info {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Dynamic Background -->
+    <div id="vanta-bg"></div>
+    <div class="grid-overlay"></div>
+    <div class="glow-overlay"></div>
+    
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="caelaficha-investigacion.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-cog"></i> <!-- Changed icon to match the provided image (gear/cog) -->
+                </div>
+                <div class="logo-text">CAELAFICHA</div>
+            </a>
+            <nav>
+                <ul>
+                    <!-- Textos corregidos para coincidir exactamente con lo solicitado -->
+                    <li><a href="caelaficha-investigacion.html">Investigacion Profunda</a></li>
+                    <li><a href="caelaficha-materialize-ideas.html">Materializacion de Ideas</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="imagenes.html">Imagenes</a></li>
+                </ul>
+            </nav>
+            <button class="cta-button" id="premium-access"><i class="fas fa-crown"></i> PREMIUM</button> <!-- Added crown icon and text "PREMIUM" -->
+        </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <!-- Título enfocado en investigación profunda -->
+            <h1>Desvela la verdad con <span class="hero-gradient">Investigación Profunda</span> impulsada por IA</h1>
+            <!-- Párrafo enfocado en análisis de datos e insights -->
+            <p>Caelaficha es tu aliado para explorar, analizar y sintetizar vastas cantidades de información, transformando datos complejos en conocimientos accionables y reveladores.</p>
+            <div class="hero-buttons">
+                <button class="cta-button" id="view-demo" onclick="document.getElementById('demo').scrollIntoView({ behavior: 'smooth' });">Ver demostración</button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-title">
+                <!-- Título y subtítulo enfocados en la investigación -->
+                <h2>Análisis Inteligente y Descubrimiento</h2>
+                <p>Módulos avanzados diseñados para potenciar tu capacidad de investigación y extraer insights valiosos con inteligencia artificial.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card floating" id="data-synthesis-module">
+                    <div class="feature-icon">
+                        <i class="fas fa-flask"></i> <!-- Icono para síntesis de datos -->
+                    </div>
+                    <h3>Síntesis de Datos Avanzada</h3>
+                    <p>Procesa y condensa grandes volúmenes de información, identificando patrones y conexiones clave.</p>
+                    <ul class="feature-list">
+                        <li>Resúmenes automáticos inteligentes</li>
+                        <li>Extracción de entidades y relaciones</li>
+                        <li>Consolidación de múltiples fuentes</li>
+                        <li>Detección de puntos de datos críticos</li>
+                    </ul>
+                </div>
+                <div class="feature-card floating" style="animation-delay: 0.5s;" id="trend-analysis-module">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i> <!-- Icono para análisis de tendencias -->
+                    </div>
+                    <h3>Análisis de Tendencias y Predicción</h3>
+                    <p>Identifica tendencias emergentes, proyecta escenarios futuros y anticipa cambios en tu sector.</p>
+                    <ul class="feature-list">
+                        <li>Modelado predictivo basado en datos</li>
+                        <li>Detección de anomalías y picos</li>
+                        <li>Proyecciones de mercado y sector</li>
+                        <li>Informes de impacto potencial</li>
+                    </ul>
+                </div>
+                <div class="feature-card floating" style="animation-delay: 1s;" id="insight-generation-module">
+                    <div class="feature-icon">
+                        <i class="fas fa-lightbulb"></i> <!-- Icono para generación de insights -->
+                    </div>
+                    <h3>Generación de Insights Accionables</h3>
+                    <p>Transforma los datos analizados en recomendaciones claras y estrategias para la toma de decisiones.</p>
+                    <ul class="feature-list">
+                        <li>Recomendaciones estratégicas personalizadas</li>
+                        <li>Identificación de oportunidades ocultas</li>
+                        <li>Evaluación de riesgos y mitigación</li>
+                        <li>Informes de inteligencia de negocio</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Demo -->
+    <section id="demo" class="interactive-demo">
+        <div class="container">
+            <div class="section-title">
+                <h2>Explora y Descubre: Generador de Estudio de Mercado</h2>
+                <p>Responde algunas preguntas y Caelaficha generará un estudio de mercado detallado para tu idea.</p>
+            </div>
+            <div class="demo-container">
+                <div class="demo-card">
+                    <!-- Simple Prompt Mode (Still available for general prompts) -->
+                    <div id="simple-prompt-mode">
+                        <h3>Asistente de Investigación General</h3>
+                        <p>Introduce un tema o un texto para un análisis rápido:</p>
+                        <input type="text" class="storage-input" id="prompt-input" placeholder="Ej: 'Resumir artículo sobre IA ética' o 'Análisis rápido de tendencias'">
+                        <div class="demo-controls">
+                            <button class="demo-btn" id="generate-text">Generar Resumen/Análisis</button>
+                            <button class="demo-btn" id="generate-image">Generar Visualización de Datos</button>
+                            <button class="demo-btn" id="translate-content">Traducir Hallazgos</button>
+                            <button class="demo-btn cta-button" id="activate-guided-mode">Iniciar Estudio de Mercado Guiado</button>
+                        </div>
+                    </div>
+
+                    <!-- Guided Prompt Mode (Market Study) -->
+                    <div id="guided-prompt-mode" style="display: none;">
+                        <h3>Estudio de Mercado Guiado para tu Idea</h3>
+                        <p>Cuanta más información nos brindes, más preciso será el estudio. ¡Vamos a desglosar tu visión!</p>
+                        <div class="storage-form">
+                            <input type="text" class="storage-input" id="guided-prompt-idea" placeholder="1. Tu idea, producto o servicio principal:">
+                            <textarea class="storage-input" id="guided-prompt-target-market" placeholder="2. ¿Quién es tu mercado objetivo? (demografía, psicografía, necesidades):"></textarea>
+                            <textarea class="storage-input" id="guided-prompt-problem-solution" placeholder="3. ¿Qué problema resuelve tu idea y cómo lo hace?"></textarea>
+                            <input type="text" class="storage-input" id="guided-prompt-unique-value" placeholder="4. ¿Qué te hace único frente a la competencia? (propuesta de valor):">
+                            <input type="text" class="storage-input" id="guided-prompt-known-competitors" placeholder="5. Competidores clave conocidos (nombres o tipos de empresas, separados por comas):">
+                            <input type="text" class="storage-input" id="guided-prompt-development-scope" placeholder="6. Alcance inicial del desarrollo (ej. MVP, producto completo, fase 1, etc.):">
+                            <input type="text" class="storage-input" id="guided-prompt-initial-budget" placeholder="7. Presupuesto inicial estimado para desarrollo (ej. $10,000 - $50,000, especificar moneda):">
+                            <input type="text" class="storage-input" id="guided-prompt-desired-timeline" placeholder="8. Plazo de lanzamiento deseado (ej. 6 meses, 1 año, 24 semanas):">
+                            <input type="text" class="storage-input" id="guided-prompt-data-sources" placeholder="9. ¿Qué tipo de datos prefieres incluir? (ej. estadísticas de mercado, estudios de casos, tendencias futuras):">
+                            <textarea class="storage-input" id="guided-prompt-risk-assessment" placeholder="10. Riesgos clave y estrategias de mitigación:"></textarea>
+                        </div>
+                        <div class="demo-controls">
+                            <button class="demo-btn" id="generate-market-study">Generar Estudio Completo</button>
+                            <button class="demo-btn" id="back-to-simple">Regresar al Modo Simple</button>
+                        </div>
+                    </div>
+
+                    <div class="demo-output" id="demo-output">
+                        <p>Tu análisis aparecerá aquí...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Storage Section -->
+    <section class="data-storage">
+        <div class="container">
+            <div class="section-title">
+                <h2>Almacenamiento Inteligente de Datos</h2>
+                <p>Guarda y organiza tus hallazgos de investigación para acceder a ellos en cualquier momento.</p>
+            </div>
+            <div class="storage-card">
+                <div class="user-id-display">
+                    <i class="fas fa-user-circle"></i> ID de Usuario: <span id="user-id">CAE-2023-001</span>
+                </div>
+                <input type="text" class="storage-input" id="note-title" placeholder="Título de la nota">
+                <textarea class="storage-textarea" id="note-content" placeholder="Contenido de la nota..."></textarea>
+                <select class="storage-select" id="note-category">
+                    <option value="">Selecciona una categoría</option>
+                    <option value="market-research">Investigación de Mercado</option>
+                    <option value="competitive-analysis">Análisis Competitivo</option>
+                    <option value="technical-insights">Insights Técnicos</option>
+                    <option value="user-feedback">Feedback de Usuarios</option>
+                </select>
+                <button class="cta-button" id="save-note">Guardar Nota</button>
+                <ul class="notes-list" id="saved-notes">
+                    <!-- Las notas guardadas aparecerán aquí -->
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section class="timeline">
+        <div class="container">
+            <div class="section-title">
+                <h2>Fases del Proceso de Investigación</h2>
+                <p>Metodología estructurada para garantizar resultados exhaustivos y confiables.</p>
+            </div>
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <span class="timeline-phase">Fase 1</span>
+                        <h3 class="timeline-title">Definición del Alcance</h3>
+                        <div class="timeline-details">
+                            <ul>
+                                <li>Identificación de objetivos y preguntas clave</li>
+                                <li>Delimitación de fuentes primarias y secundarias</li>
+                                <li>Establecimiento de criterios de relevancia</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <span class="timeline-phase">Fase 2</span>
+                        <h3 class="timeline-title">Recopilación de Datos</h3>
+                        <div class="timeline-details">
+                            <ul>
+                                <li>Extracción automatizada de múltiples fuentes</li>
+                                <li>Validación de calidad y procedencia</li>
+                                <li>Organización taxonómica de información</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <span class="timeline-phase">Fase 3</span>
+                        <h3 class="timeline-title">Análisis Profundo</h3>
+                        <div class="timeline-details">
+                            <ul>
+                                <li>Procesamiento mediante modelos de IA especializados</li>
+                                <li>Detección de patrones y correlaciones ocultas</li>
+                                <li>Validación cruzada de hallazgos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <span class="timeline-phase">Fase 4</span>
+                        <h3 class="timeline-title">Síntesis y Reporte</h3>
+                        <div class="timeline-details">
+                            <ul>
+                                <li>Generación de insights accionables</li>
+                                <li>Elaboración de visualizaciones interactivas</li>
+                                <li>Preparación de reportes ejecutivos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Metrics Section -->
+    <section class="metrics">
+        <div class="container">
+            <div class="section-title">
+                <h2>Impacto Cuantificable</h2>
+                <p>Resultados demostrables que potencian tu capacidad investigativa</p>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">78%</div>
+                    <div class="metric-label">Reducción en tiempo de investigación</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">3.5X</div>
+                    <div class="metric-label">Mayor profundidad de análisis</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">92%</div>
+                    <div class="metric-label">Precisión en identificación de patrones</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">40+</div>
+                    <div class="metric-label">Fuentes integradas</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Initialize Vanta.js background
+        VANTA.NET({
+            el: "#vanta-bg",
+            color: 0x6a4cff,
+            backgroundColor: 0x70812,
+            points: 12,
+            maxDistance: 22,
+            spacing: 18
+        });
+
+        // Floating animation for feature cards
+        document.querySelectorAll('.floating').forEach(card => {
+            card.style.animation = 'floating 3s infinite ease-in-out';
+            card.style.animationDelay = Math.random() + 's';
+        });
+
+        // Demo interactivity
+        document.getElementById('activate-guided-mode').addEventListener('click', function() {
+            document.getElementById('simple-prompt-mode').style.display = 'none';
+            document.getElementById('guided-prompt-mode').style.display = 'block';
+        });
+
+        document.getElementById('back-to-simple').addEventListener('click', function() {
+            document.getElementById('guided-prompt-mode').style.display = 'none';
+            document.getElementById('simple-prompt-mode').style.display = 'block';
+        });
+
+        // Simulate content generation
+        document.getElementById('generate-market-study').addEventListener('click', function() {
+            const output = document.getElementById('demo-output');
+            output.innerHTML = '<div class="loading-spinner"></div><p>Generando estudio de mercado completo...</p>';
+            
+            setTimeout(() => {
+                output.innerHTML = `
+                    <h3>Resumen Ejecutivo del Estudio de Mercado</h3>
+                    <p>Análisis completo generado para tu proyecto. El estudio incluye:</p>
+                    <ul>
+                        <li>Evaluación del mercado objetivo y tamaño potencial</li>
+                        <li>Análisis competitivo detallado</li>
+                        <li>Propuesta de valor diferenciada</li>
+                        <li>Plan de desarrollo por fases</li>
+                        <li>Proyección financiera inicial</li>
+                        <li>Evaluación de riesgos y estrategias de mitigación</li>
+                    </ul>
+                    <div style="margin-top: 20px;">
+                        <button class="cta-button">Descargar Reporte Completo (PDF)</button>
+                        <button class="secondary-button">Ver Resumen Interactivo</button>
+                    </div>
+                `;
+            }, 3000);
+        });
+
+        // Simple prompt generation
+        document.getElementById('generate-text').addEventListener('click', function() {
+            const prompt = document.getElementById('prompt-input').value;
+            if (!prompt) return;
+            
+            const output = document.getElementById('demo-output');
+            output.innerHTML = '<div class="loading-spinner"></div><p>Procesando tu solicitud...</p>';
+            
+            setTimeout(() => {
+                output.innerHTML = `
+                    <h3>Resultados del Análisis</h3>
+                    <p><strong>Tema solicitado:</strong> ${prompt}</p>
+                    <p>El análisis de las tendencias actuales muestra un crecimiento sostenido del 15% interanual en este sector, con especial énfasis en las soluciones basadas en IA. Los principales actores están enfocando sus esfuerzos en la integración de tecnologías predictivas y la mejora de la experiencia del usuario.</p>
+                    <p>Recomendación clave: Considerar el desarrollo de módulos especializados que aprovechen el aprendizaje automático para ofrecer insights predictivos a los usuarios finales.</p>
+                `;
+            }, 2000);
+        });
+
+        // Save note functionality
+        document.getElementById('save-note').addEventListener('click', function() {
+            const title = document.getElementById('note-title').value;
+            const content = document.getElementById('note-content').value;
+            const category = document.getElementById('note-category').value;
+            
+            if (!title || !content) return;
+            
+            const notesList = document.getElementById('saved-notes');
+            const noteItem = document.createElement('li');
+            noteItem.className = 'data-item';
+            noteItem.innerHTML = `
+                <div class="data-content">
+                    <strong>${title}</strong> - ${getCategoryName(category)}
+                    <p>${content.substring(0, 100)}${content.length > 100 ? '...' : ''}</p>
+                </div>
+                <button class="delete-btn">Eliminar</button>
+            `;
+            
+            notesList.appendChild(noteItem);
+            
+            // Clear inputs
+            document.getElementById('note-title').value = '';
+            document.getElementById('note-content').value = '';
+            document.getElementById('note-category').selectedIndex = 0;
+            
+            // Add delete functionality
+            noteItem.querySelector('.delete-btn').addEventListener('click', function() {
+                noteItem.remove();
+            });
+        });
+
+        function getCategoryName(category) {
+            const categories = {
+                'market-research': 'Investigación de Mercado',
+                'competitive-analysis': 'Análisis Competitivo',
+                'technical-insights': 'Insights Técnicos',
+                'user-feedback': 'Feedback de Usuarios'
+            };
+            return categories[category] || 'Sin categoría';
+        }
+
+        // Premium access button
+        document.getElementById('premium-access').addEventListener('click', function() {
+            alert('¡Accede a todas las funciones avanzadas de investigación con nuestro plan Premium!');
+        });
+    </script>
+</body>
+</html>

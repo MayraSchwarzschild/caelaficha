@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caelaficha - Generación de Imágenes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6a4cff;
+            --secondary: #00e1ff;
+            --accent: #ff2a78;
+            --dark: #0a0c17;
+            --darker: #070812;
+            --light: #e0f7ff;
+            --text: #c7e5ff;
+            --card-bg: rgba(20,22,40,0.7);
+            /* Premium button colors - now dynamic yellow */
+            --premium-button-light: #FFEB3B; /* Amarillo brillante */
+            --premium-button-dark: #FFC107;  /* Amarillo-naranja */
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background: var(--darker); color: var(--text); font-family:'Exo 2',sans-serif; line-height: 1.7; overflow-x: hidden; }
+        
+        header { 
+            background: rgba(10, 12, 23, 0.85);
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            padding: 25px 0;
+            border-bottom: 1px solid rgba(106,76,255,0.2); 
+            backdrop-filter: blur(10px);
+        }
+        .header-container { max-width:1200px; margin:0 auto; padding:0 20px; display:flex; align-items:center; justify-content:space-between; }
+        .logo { display:flex; align-items:center; text-decoration:none; gap: 12px; }
+        .logo-icon { font-size:28px; color: var(--secondary); animation: pulse 3s infinite; }
+        .logo-text { font-family:'Orbitron',sans-serif; font-size:26px; font-weight:800; background: linear-gradient(90deg,var(--primary),var(--secondary)); -webkit-background-clip:text; background-clip: text; color:transparent; letter-spacing:1px; }
+        nav ul { display:flex; list-style:none; gap:35px; }
+        nav a { color: var(--light); text-decoration:none; font-weight:600; font-size:16px; position:relative; transition: all 0.3s; }
+        nav a::after { content:''; position:absolute; bottom:-5px; left:0; width:0; height:2px; background: var(--secondary); transition:width 0.3s; }
+        nav a:hover { color: var(--secondary); }
+        nav a:hover::after { width:100%; }
+
+        .cta-button { 
+            background: radial-gradient(circle at center, var(--premium-button-light) 0%, var(--premium-button-dark) 100%); 
+            color: black; 
+            border:none; 
+            padding:12px 30px; 
+            border-radius:30px; 
+            font-family:'Exo 2',sans-serif; 
+            font-weight:700; 
+            font-size:16px; 
+            cursor:pointer; 
+            text-transform:uppercase; 
+            letter-spacing:1px; 
+            box-shadow:0 0 20px rgba(255,215,0,0.4); 
+            position:relative; 
+            overflow:hidden; 
+            display:flex; 
+            align-items:center; 
+            gap:8px; 
+            transition: all 0.3s ease; 
+        }
+        .cta-button i { font-size:18px; }
+        .cta-button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 40px;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(25deg);
+            transition: all 0.4s;
+        }
+        .cta-button:hover::after {
+            left: 120%;
+        }
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(255,215,0,0.7); 
+        }
+
+        @keyframes pulse { 0% { transform: scale(1); opacity:1; } 50% { transform: scale(1.1); opacity:0.8; } 100% { transform: scale(1); opacity:1; } }
+        
+        main { padding: 40px 20px; max-width:1200px; margin:0 auto; }
+        h1 { font-family:'Orbitron',sans-serif; font-size:2.8rem; text-align:center; margin-bottom:20px; }
+        p.description { text-align:center; max-width:800px; margin:0 auto 40px; color: var(--light); }
+        
+        /* Section Title */
+        .section-title {
+            text-align: center;
+            margin-bottom: 70px;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem; /* Adjusted for sub-sections */
+            display: inline-block;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+        
+        .section-title p {
+            max-width: 600px;
+            margin: 25px auto 0;
+            font-size: 1.1rem;
+            color: var(--light);
+        }
+
+        /* Image Categories Section */
+        .image-categories {
+            padding: 60px 0; /* Reduced padding from 100px */
+            text-align: center;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            justify-items: center; /* Ensures horizontal centering of cards */
+        }
+
+        .image-category-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(106, 76, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            cursor: pointer;
+            display: flex; /* Flexbox for content alignment */
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            min-height: 250px; /* Ensure cards have a consistent height */
+        }
+
+        .image-category-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 40px rgba(106, 76, 255, 0.2);
+        }
+        
+        .image-category-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .image-category-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+
+        .image-category-card p {
+            font-size: 0.95rem;
+            color: var(--light);
+            margin-bottom: 20px;
+            flex-grow: 1; /* Allows paragraph to take available space */
+        }
+
+        .image-category-card .cta-button {
+            width: auto; /* Allow button to size naturally */
+            padding: 10px 25px;
+            font-size: 0.9rem;
+            margin-top: auto; /* Pushes button to the bottom of the card */
+        }
+
+
+        /* Grid for form inputs to maintain symmetry */
+        .form-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive columns */
+            gap: 20px; 
+            justify-content: center; /* Center items horizontally */
+        }
+
+        .form-card { 
+            background: var(--card-bg); 
+            padding:20px; 
+            border-radius:8px; 
+            border: 1px solid rgba(106, 76, 255, 0.2); 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 120px; /* Ensure consistent card height */
+            justify-content: space-between; /* Distribute content within the card */
+        }
+        .form-card label { display:block; margin-bottom:8px; font-weight:600; color: var(--secondary); }
+        .form-card input, .form-card textarea, .form-card select { 
+            width:100%; 
+            padding:10px; 
+            border:1px solid rgba(106,76,255,0.4); 
+            border-radius:6px; 
+            background: rgba(15,18,45,0.6); 
+            color: var(--text); 
+            font-family:'Exo 2',sans-serif; 
+            transition: border-color 0.3s ease, box-shadow 0.3s ease; 
+        }
+        .form-card input:focus, .form-card textarea:focus, .form-card select:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(0, 225, 255, 0.2);
+        }
+        .form-card textarea { resize:vertical; min-height:80px; }
+        .actions { text-align:center; margin-top:30px; display: flex; flex-direction: column; align-items: center; gap: 15px;}
+
+        /* Prompt display area */
+        .prompt-display-container {
+            background: rgba(15, 18, 45, 0.7);
+            border: 1px solid rgba(106, 76, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 30px;
+            text-align: left;
+            font-size: 0.95rem;
+            color: var(--light);
+            min-height: 50px;
+            overflow-wrap: break-word; /* Ensures long text wraps */
+            display: flex; /* Use flex to center text vertically if it's short */
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* AI Response Section */
+        .ai-response-container {
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 225, 255, 0.2);
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-top: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center; /* Center the image output */
+        }
+
+        .ai-response-container h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .image-output-container {
+            margin-top: 20px;
+            width: 100%;
+            min-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(15, 18, 45, 0.6);
+            border: 1px solid rgba(106, 76, 255, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .generated-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            display: block;
+            object-fit: contain;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid var(--secondary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .header-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            p.description {
+                font-size: 1rem;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-atom logo-icon"></i>
+                <span class="logo-text">CAELAFICHA</span>
+            </a>
+            <nav>
+                <ul>
+                    <!-- Updated links as requested -->
+                    <li><a href="caelaficha-investigacion.html">Investigación Profunda</a></li>
+                    <li><a href="caelaficha-materiales.html">Materialización de Ideas</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="imagenes.html">Imágenes</a></li>
+                    <li><a href="premium.html" class="cta-button">Premium</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <h1>Genera Imágenes con Inteligencia Artificial</h1>
+        <p class="description">Utiliza este formulario detallado para guiar a la IA y crear logos o imágenes únicas y sorprendentes. Cuanta más información proporciones, mejor será el resultado.</p>
+        
+        <section class="image-categories">
+            <div class="section-title">
+                <h2>Ideas y Categorías de Generación</h2>
+                <p>Elige una categoría para empezar o desplázate hacia abajo para el formulario completo.</p>
+            </div>
+            <div class="categories-grid">
+                <div class="image-category-card">
+                    <div class="image-category-icon"><i class="fas fa-gem"></i></div>
+                    <h3>Crear Logos Impactantes</h3>
+                    <p>Genera logotipos profesionales y distintivos para tu marca o proyecto.</p>
+                    <a href="#imagePromptForm" class="cta-button">Empezar Logo</a>
+                </div>
+                <div class="image-category-card">
+                    <div class="image-category-icon"><i class="fas fa-paint-brush"></i></div>
+                    <h3>Ilustraciones Personalizadas</h3>
+                    <p>Crea ilustraciones únicas para libros, blogs, presentaciones o arte digital.</p>
+                    <a href="#imagePromptForm" class="cta-button">Generar Ilustración</a>
+                </div>
+                <div class="image-category-card">
+                    <div class="image-category-icon"><i class="fas fa-camera-retro"></i></div>
+                    <h3>Imágenes Fotorrealistas</h3>
+                    <p>Diseña escenas y objetos con un realismo sorprendente para visualizaciones o fondos.</p>
+                    <a href="#imagePromptForm" class="cta-button">Crear Foto</a>
+                </div>
+                <div class="image-category-card">
+                    <div class="image-category-icon"><i class="fas fa-icons"></i></div>
+                    <h3>Diseño de Iconos Únicos</h3>
+                    <p>Desarrolla sets de iconos estilizados para aplicaciones, sitios web o interfaces de usuario.</p>
+                    <a href="#imagePromptForm" class="cta-button">Diseñar Icono</a>
+                </div>
+                
+                <!-- AQUÍ AGREGARÉ LAS DOS NUEVAS TARJETAS -->
+                <div class="image-category-card">
+                    <div class="image-category-icon"><i class="fas fa-object-group"></i></div>
+                    <h3>Diseño de Banners</h3>
+                    <p>Crea banners profesionales para redes sociales, sitios web o campañas publicitarias.</p>
+                    <a href="#imagePromptForm" class="cta-button">Crear Banner</a>
+                </div>
+                <div class="image-category-card">
+                    <div class="image-category-icon"><i class="fas fa-palette"></i></div>
+                    <h3>Galería de Arte</h3>
+                    <p>Genera obras de arte digital únicas en diversos estilos para decoración o colección.</p>
+                    <a href="#imagePromptForm" class="cta-button">Explorar Arte</a>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-title" style="margin-top: 80px;">
+            <h2>Formulario Detallado de Prompt</h2>
+            <p>Ajusta cada parámetro para afinar la visión de tu imagen perfecta.</p>
+        </div>
+
+        <form id="imagePromptForm" class="form-grid">
+            <div class="form-card">
+                <label for="imageType">Tipo de Imagen:</label>
+                <select id="imageType">
+                    <option value="">Selecciona un tipo</option>
+                    <option value="logo">Logo</option>
+                    <option value="ilustracion">Ilustración</option>
+                    <option value="foto">Foto</option>
+                    <option value="icono">Icono</option>
+                    <option value="arte_digital">Arte Digital</option>
+                    <option value="banner">Banner</option>
+                    <option value="galeria_arte">Galería de Arte</option>
+                </select>
+            </div>
+
+            <div class="form-card">
+                <label for="subject">Tema o Sujeto Principal:</label>
+                <input type="text" id="subject" placeholder="Ej: un león, una nave espacial, un café, una startup de tecnología">
+            </div>
+
+            <div class="form-card">
+                <label for="visualStyle">Estilo Visual:</label>
+                <select id="visualStyle">
+                    <option value="">Selecciona un estilo</option>
+                    <option value="fotorrealista">Fotorrealista</option>
+                    <option value="minimalista">Minimalista</option>
+                    <option value="abstracto">Abstracto</option>
+                    <option value="3d">3D Rendering</option>
+                    <option value="acuarela">Acuarela</option>
+                    <option value="pixel_art">Pixel Art</option>
+                    <option value="dibujos_animados">Dibujos Animados</option>
+                    <option value="surrealista">Surrealista</option>
+                    <option value="vaporwave">Vaporwave</option>
+                    <option value="cyberpunk">Cyberpunk</option>
+                    <option value="futurista">Futurista</option>
+                    <option value="vintage">Vintage</option>
+                    <option value="geometrico">Geométrico</option>
+                </select>
+            </div>
+
+            <div class="form-card">
+                <label for="colorPalette">Paleta de Colores (Opcional):</label>
+                <input type="text" id="colorPalette" placeholder="Ej: tonos pastel, colores vibrantes, monocromático azul, dorado y negro">
+            </div>
+
+            <div class="form-card">
+                <label for="keyElements">Elementos Clave Adicionales:</label>
+                <textarea id="keyElements" placeholder="Ej: con hojas de roble, un circuito integrado, brillos, un escudo"></textarea>
+            </div>
+
+            <div class="form-card">
+                <label for="background">Fondo o Escena (Opcional):</label>
+                <input type="text" id="background" placeholder="Ej: en el espacio, sobre un fondo blanco, en una ciudad futurista">
+            </div>
+
+            <div class="form-card">
+                <label for="mood">Ánimo o Atmósfera (Opcional):</label>
+                <select id="mood">
+                    <option value="">Selecciona un ánimo</option>
+                    <option value="alegre">Alegre y Optimista</option>
+                    <option value="serio">Serio y Profesional</option>
+                    <option value="mistico">Místico y Enigmático</option>
+                    <option value="energetico">Energético y Dinámico</option>
+                    <option value="calmado">Calmado y Sereno</option>
+                    <option value="dramatico">Dramático</option>
+                </select>
+            </div>
+
+            <div class="form-card">
+                <label for="resolution">Resolución/Tamaño (Opcional):</label>
+                <input type="text" id="resolution" placeholder="Ej: 1920x1080, alta resolución, cuadrado">
+            </div>
+
+            <div class="form-card full-width" style="grid-column: 1 / -1;">
+                <label for="customPrompt">Instrucciones Adicionales / Prompt Personalizado (Añade detalles específicos o palabras clave):</label>
+                <textarea id="customPrompt" placeholder="Ej: iluminación dramática, con un reflejo, que parezca pintado a mano, concepto abstracto para startup tech"></textarea>
+            </div>
+        </form>
+
+        <div class="actions">
+            <button id="generatePromptBtn" class="cta-button">Generar Prompt</button>
+            <div id="generatedPromptDisplay" class="prompt-display-container">
+                <!-- El prompt generado aparecerá aquí -->
+                Tu prompt aparecerá aquí. Ajusta los campos del formulario para construirlo.
+            </div>
+            <button id="generateImageFromPromptBtn" class="cta-button"><i class="fas fa-magic"></i>Generar Imagen con IA</button>
+        </div>
+
+        <div class="ai-response-container">
+            <h2>Imagen Generada por IA</h2>
+            <div id="loadingSpinner" class="loading-spinner" style="display: none;"></div>
+            <div class="image-output-container">
+                <img id="generatedImage" src="https://via.placeholder.com/600x400/0a0c17/c7e5ff?text=Tu+imagen+aparecerá+aquí" alt="Imagen Generada por IA" class="generated-image">
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        const imageType = document.getElementById('imageType');
+        const subject = document.getElementById('subject');
+        const visualStyle = document.getElementById('visualStyle');
+        const colorPalette = document.getElementById('colorPalette');
+        const keyElements = document.getElementById('keyElements');
+        const background = document.getElementById('background');
+        const mood = document.getElementById('mood');
+        const resolution = document.getElementById('resolution');
+        const customPrompt = document.getElementById('customPrompt');
+        const generatePromptBtn = document.getElementById('generatePromptBtn');
+        const generatedPromptDisplay = document.getElementById('generatedPromptDisplay');
+        const generateImageFromPromptBtn = document.getElementById('generateImageFromPromptBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const generatedImage = document.getElementById('generatedImage');
+
+        // Function to construct and display the prompt
+        const constructPrompt = () => {
+            let promptParts = [];
+
+            if (imageType.value) promptParts.push(imageType.value);
+            if (subject.value) promptParts.push(subject.value);
+            if (visualStyle.value) promptParts.push(`estilo ${visualStyle.value}`);
+            if (colorPalette.value) promptParts.push(`colores: ${colorPalette.value}`);
+            if (keyElements.value) promptParts.push(keyElements.value);
+            if (background.value) promptParts.push(`fondo: ${background.value}`);
+            if (mood.value) promptParts.push(`ambiente ${mood.value}`);
+            if (resolution.value) promptParts.push(`resolución ${resolution.value}`);
+            if (customPrompt.value) promptParts.push(customPrompt.value);
+
+            const finalPrompt = promptParts.filter(part => part.trim() !== '').join(', ').trim(); // Filter empty parts
+            generatedPromptDisplay.textContent = finalPrompt || "Tu prompt aparecerá aquí. Ajusta los campos del formulario para construirlo.";
+            
+            // The "Generar Imagen con IA" button is now always visible, and its disabled state is managed by the generation process.
+        };
+
+        // Add event listeners to all form fields to update the prompt dynamically
+        const formFields = document.querySelectorAll('#imagePromptForm input, #imagePromptForm textarea, #imagePromptForm select');
+        formFields.forEach(field => {
+            field.addEventListener('input', constructPrompt);
+            field.addEventListener('change', constructPrompt); // For select elements
+        });
+
+        // Initial prompt construction on page load
+        window.onload = constructPrompt;
+
+        // Trigger prompt construction on button click (redundant if using input/change events, but good for explicit action)
+        generatePromptBtn.onclick = constructPrompt;
+
+        // Image Generation Logic
+        generateImageFromPromptBtn.onclick = async () => {
+            const prompt = generatedPromptDisplay.textContent.trim();
+
+            if (!prompt || prompt === "Tu prompt aparecerá aquí. Ajusta los campos del formulario para construirlo.") {
+                generatedImage.src = "https://via.placeholder.com/600x400/ff2a78/e0f7ff?text=Por+favor+genera+un+prompt+primero.";
+                generatedImage.alt = "Error: Prompt vacío";
+                return;
+            }
+
+            // Clear previous image and show loading
+            generatedImage.src = "https://via.placeholder.com/600x400/0a0c17/c7e5ff?text=Generando+imagen...";
+            generatedImage.alt = "Generando imagen...";
+            loadingSpinner.style.display = 'block';
+            generateImageFromPromptBtn.disabled = true; // Disable button during generation
+
+            try {
+                const payload = { instances: { prompt: prompt }, parameters: { "sampleCount": 1 } };
+                const apiKey = ""; // Canvas will provide this API key at runtime
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("API Error:", errorData);
+                    generatedImage.src = `https://via.placeholder.com/600x400/ff2a78/e0f7ff?text=Error+en+la+API:+${response.status}`;
+                    generatedImage.alt = `Error en la API: ${response.status}`;
+                    return;
+                }
+
+                const result = await response.json();
+
+                if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
+                    const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                    generatedImage.src = imageUrl;
+                    generatedImage.alt = `Imagen generada para: "${prompt}"`;
+                } else {
+                    generatedImage.src = "https://via.placeholder.com/600x400/ff2a78/e0f7ff?text=No+se+pudo+generar+la+imagen.+Intenta+de+nuevo.";
+                    generatedImage.alt = "Error: No se pudo generar la imagen";
+                }
+            } catch (error) {
+                console.error("Network or parsing error:", error);
+                generatedImage.src = "https://via.placeholder.com/600x400/ff2a78/e0f7ff?text=Error+de+conexión+o+inesperado.";
+                generatedImage.alt = "Error de conexión o inesperado.";
+            } finally {
+                loadingSpinner.style.display = 'none';
+                generateImageFromPromptBtn.disabled = false; // Enable button after generation
+            }
+        };
+    </script>
+</body>
+</html>
