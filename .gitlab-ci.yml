@@ -1,0 +1,15 @@
+image: alpine:latest
+
+stages:
+  - pages
+
+pages:
+  stage: pages
+  script:
+    - mkdir -p public
+    - cp *.html public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - principal
